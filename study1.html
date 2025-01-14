@@ -2,9 +2,128 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Canvas</title>
+    <style>
+        canvas{
+            border: 1px solid black;
+            margin: auto;
+            display: block;
+
+        }
+    </style>
 </head>
 <body>
-
+<!-- 默认是一个300*150画布 -->
+<canvas width="600" height="600">您当前浏览器不支持canvas，请升级后再试</canvas>
 </body>
+<script>
+    var canvas = document.querySelector("canvas");
+    var context = canvas.getContext("2d");
+    /*
+    // context.moveTo(x, y); 规定一条折线的起点
+    // context.lineTo(x, y); 组成线段/折线的点（除起点外）
+    // context.stroke();     绘制线段/折线 调用多次会重复绘制
+    */
+
+    /*
+    context.moveTo(0, 0);
+    context.lineTo(300, 300);
+    context.lineTo(0, 600);
+    context.strokeStyle="#0f0";
+    context.lineWidth=100;
+    // context.stroke();
+
+    context.moveTo(600, 0);
+    context.lineTo(300, 300);
+    context.lineTo(600, 600);
+    context.stroke();
+     */
+
+    /*
+    context.moveTo(200,200);
+    context.lineTo(400,400);
+    context.lineTo(0,500);
+    context.strokeStyle="#0f0";
+    context.lineWidth=100;
+    context.lineCap="round";
+    context.lineJoin="round";
+    context.globalAlpha=0.8;
+    context.stroke();
+
+     */
+
+    /*
+    context.beginPath();
+    context.moveTo(0, 0);
+    context.lineTo(300, 300);
+    context.lineTo(0, 600);
+    context.strokeStyle="#0f0";
+    context.lineWidth=100;
+    context.lineJoin="round"
+    context.stroke();
+    context.closePath();
+
+    context.beginPath();
+    context.moveTo(600, 0);
+    context.lineTo(300, 300);
+    context.lineTo(600, 600);
+
+    context.strokeStyle="#ff0";
+    context.lineCap="round";
+    context.lineJoin="round"
+    context.stroke();
+    // context.lineWidth=100;
+    context.closePath();
+
+     */
+    context.beginPath();
+    context.moveTo(100,100);
+    context.lineTo(200,50);
+    context.lineTo(300,100);
+    context.lineTo(400,50);
+    context.lineTo(500,100);
+    context.strokeStyle='orange';
+    context.lineWidth = 20;
+    context.lineCap="round";
+    context.stroke();
+    context.closePath();
+
+    context.beginPath();
+    context.moveTo(100,200);
+    context.lineTo(200,150);
+    context.lineTo(300,200);
+    context.lineTo(400,150);
+    context.lineTo(500,200);
+    context.strokeStyle='red';
+    context.lineWidth = 20;
+    context.lineJoin="round";
+    context.lineCap="square";
+    context.stroke();
+    context.closePath();
+
+    context.beginPath();
+    context.moveTo(100,300);
+    context.lineTo(200,250);
+    context.lineTo(300,300);
+    context.lineTo(400,250);
+    context.lineTo(500,300);
+    context.strokeStyle='skyblue';
+    context.lineWidth = 20;
+    context.lineJoin="miter";
+    context.lineCap="square";
+    context.stroke();
+    context.closePath();
+
+    context.beginPath();
+    context.strokeStyle="yellow";
+    context.strokeRect(100,400,200,100);
+    context.closePath();
+
+    context.beginPath();
+    context.fill("purple");
+    context.fillRect(400,400,200,100);
+    context.closePath();
+
+
+</script>
 </html>

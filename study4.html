@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        canvas{
+            border: 1px solid black;
+        }
+    </style>
+</head>
+<body>
+<canvas width="600" height="600"></canvas>
+</body>
+<script>
+    var canvas = document.querySelector("canvas");
+    var ctx = canvas.getContext("2d");
+    ctx.beginPath();
+    ctx.font="100px Verdana";
+    // ctx.strokeText("描猫描猫",0,100);
+    // ctx.fillText("描猫描猫",0,300);
+    // topline middleline baseline bottomline
+    // ctx.textBaseline="top";
+    ctx.textBaseline="middle";
+    // ctx.textBaseline="bottom";
+    ctx.textAlign="center";
+
+    ctx.fillText("abcdefg",300,300,500);
+    var width = ctx.measureText("abcdefg").width;
+    console.log(width)
+    ctx.closePath();
+
+
+    // 文字在垂直方向上的对齐方式
+    ctx.beginPath();
+    ctx.moveTo(0,300);
+    ctx.lineTo(600,300);
+    ctx.setLineDash([10,5])
+    ctx.stroke();
+    ctx.closePath();
+
+    ctx.beginPath();
+    ctx.moveTo(300,0);
+    ctx.lineTo(300,600);
+    ctx.setLineDash([10,5])
+    ctx.stroke();
+    ctx.closePath();
+
+</script>
+</html>

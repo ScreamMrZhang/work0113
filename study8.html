@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<!--<canvas></canvas>-->
+<img  src="images/background2.jpg">
+</body>
+<script>
+    com
+    var canvas = document.querySelector("canvas");
+    var ctx = canvas.getContext("2d");
+    var img = new Image();
+    img.src = "./images/background2.jpg";
+    img.onload = function() {
+        canvas.width = 666;
+        canvas.height = 666;
+
+        ctx.drawImage(this, 800, 50,666,666,0,0,666,666);
+
+    }
+</script>
+</html>

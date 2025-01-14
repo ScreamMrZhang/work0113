@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        canvas{
+            border: 1px solid black;
+        }
+    </style>
+</head>
+<body>
+<i class="baz" style="width: 1000px;height: 600px;"></i>
+<button class="download">下载</button>
+</body>
+<script>
+    var ctx = null;
+
+    (function (window, document) {
+
+        window.charts = {
+            init: function (el) {
+                // 获取dom节点
+                if (typeof el === "string") {
+                    el = document.querySelector(el);
+                }
+                if (!(el instanceof HTMLElement)) {
+                    throw new Error("Expected a valid HTML element");
+                }
+                var elStyleInfo = window.getComputedStyle(el);
+                var width = parseInt(elStyleInfo.width);
+                var height = parseInt(elStyleInfo.height);
+                var dpr = window.devicePixelRatio;
+                var canvas = document.createElement("canvas");
+                canvas.width = width * dpr;
+                canvas.height = height * dpr;
+                canvas.style.cssText = `transform-origin: 0 0;transform: scale(${1 / dpr})`;
+                ctx = canvas.getContext("2d");
+                ctx.scale(dpr, dpr);
+                el.parentElement.replaceChild(canvas, el)
+                return this;
+            },
+            render: function () {
+                ctx.beginPath();
+                var gradient = ctx.createLinearGradient(0,0,200,200);
+                gradient.addColorStop(0,'red');
+                gradient.addColorStop(0.5,'orange');
+                gradient.addColorStop(1,'pink');
+                ctx.fillStyle=gradient;
+                ctx.fillRect(0,0,200,200);
+
+                ctx.closePath();
+                return this;
+            },
+            drawImage: function (imageUrl) {
+                // 加载图片，同时不让其渲染到页面上
+                var image = new Image();
+                image.src = imageUrl;
+                image.onload = function () {
+                    ctx.drawImage(this, 0, 0,this.width,this.height,0,0,400,240);
+                    // 将canvas转换成图片地址
+                }
+            }
+        }
+    })(window, document)
+    charts.init(".baz").render().drawImage("./images/background2.jpg")
+
+    var downloadEl = document.querySelector(".download");
+    downloadEl.onclick = function () {
+        var canvas = document.querySelector("canvas");
+        canvas.toBlob(function (blob) {
+
+            // var fd = new FormData();
+            // fd.append("file", blob);
+            // var xhr = new XMLHttpRequest();
+            // xhr.open("POST",'http://192.168.68.180:3000/api/upload')
+            // xhr.upload.onloadend = function () {}
+            // xhr.upload.onprogress =function () {}
+            // xhr.send(fd);
+
+
+            var url = URL.createObjectURL(blob);
+            var aElement = document.createElement("a");
+            aElement.download = "download.jpg";
+            aElement.href=url;
+            aElement.click();
+
+        },"image/jpg");
+        // console.log(dataURL);
+
+
+    }
+</script>
+</html>

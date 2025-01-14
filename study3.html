@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<canvas width="100" height="100"></canvas>
+</body>
+<script>
+    var canvas = document.querySelector("canvas");
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    window.onresize = function() {
+        canvas.width = this.innerWidth;
+        canvas.height = this.innerHeight;
+    }
+    var ctx = canvas.getContext("2d");
+    ctx.beginPath();
+    ctx.arc(600,400,200,0.4,5.8);
+    ctx.lineTo(600,400);
+    ctx.fillStyle="yellow";
+    ctx.fill();
+    // ctx.stroke();
+    ctx.closePath();
+
+    ctx.beginPath();
+    ctx.arc(650,300,40,0,2*Math.PI);
+    ctx.fillStyle="black";
+    ctx.fill();
+    ctx.closePath();
+
+    ctx.beginPath();
+    ctx.arc(700,400,30,0.25*Math.PI,1.75*Math.PI);
+    ctx.lineTo(700,400)
+    ctx.fillStyle="black";
+    ctx.fill();
+    ctx.closePath();
+
+    ctx.beginPath();
+    ctx.arc(800,400,30,0.25*Math.PI,1.75*Math.PI);
+    ctx.lineTo(800,400)
+    ctx.fillStyle="black";
+    ctx.fill();
+    ctx.closePath();
+
+    ctx.beginPath();
+    ctx.arc(900,400,30,0.25*Math.PI,1.75*Math.PI);
+    ctx.lineTo(900,400)
+    ctx.fillStyle="black";
+    ctx.fill();
+    ctx.closePath();
+
+    ctx.beginPath();
+    ctx.ellipse(1200,400,200,100,(Math.PI/180*0),(Math.PI/180*0),2*Math.PI);
+    ctx.setLineDash([10,10]);
+    ctx.lin
+    ctx.stroke();
+    ctx.closePath();
+
+    /*
+    var deg = 0.1;
+    function drawEllipse() {
+        requestAnimationFrame(function () {
+            deg+=0.05;
+            ctx.beginPath();
+            ctx.ellipse(1200,400,200,100,(Math.PI*deg),0,2*Math.PI);
+            ctx.strokeStyle=`#${Math.random().toString().slice(2,8)}`;
+            ctx.stroke();
+            ctx.closePath();
+            if (deg<=2){
+                drawEllipse();
+            }
+        })
+    }
+    drawEllipse();
+
+     */
+</script>
+</html>

@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        canvas {
+            border: 1px solid black;
+        }
+    </style>
+</head>
+<body>
+<canvas width="800" height="800"></canvas>
+</body>
+<script>
+    var PL = 50;
+    var PR = 50;
+    var PT = 50;
+    var PB = 50;
+
+    var Y_BLOCK_COUNT = 5;
+    var Y_TEXT_SIZE = 20;
+    var X_TEXT_SIZE = 20;
+    var DATA_CIRCULAR_RADIUS = 20;
+    var DATA_RECT_WIDTH = 30;
+
+    var XData = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    var YData = [150, 230, 224, 218, 135, 147, 260, 100, 200, 300, 400, 640, 710];
+
+    var canvas = document.querySelector("canvas");
+    var LB = {x: PL, y: canvas.height - PB};
+    var RB = {x: canvas.width - PR, y: canvas.height - PB};
+    var LT = {x: PL, y: PT};
+    var RT = {x: canvas.width - PR, y: PT};
+    var ctx = canvas.getContext("2d");
+
+    var max = YData.reduce((a, b) => (a > b ? a : b));
+    // console.log(max)
+    var maxY = max % 100 === 0 ? max : (parseInt(max / 100) + 1) * 100;
+
+    // console.log(maxY)
+
+    function initDraw() {
+        drawBorder();
+        drawXAxis();
+        drawXScale();
+        drawYScale();
+    }
+
+    initDraw()
+
+    function drawBorder() {
+        ctx.beginPath();
+        ctx.moveTo(PL, PT);
+        ctx.lineTo(canvas.width - PR, PT);
+        ctx.lineTo(canvas.width - PR, canvas.height - PB);
+        ctx.lineTo(PL, canvas.height - PB);
+        ctx.lineTo(PR, PT);
+        ctx.strokeStyle = "#aeaeae";
+        ctx.setLineDash([20])
+        ctx.globalAlpha = 0.5
+        ctx.stroke();
+        ctx.closePath();
+    }
+
+    function drawXAxis() {
+        ctx.beginPath();
+        ctx.moveTo(LB.x, LB.y);
+        ctx.lineTo(RB.x, RB.y);
+        ctx.strokeStyle = "#6e7078";
+        ctx.setLineDash([]);
+        // ctx.globalAlpha=0.5
+        ctx.stroke();
+        ctx.closePath();
+    }
+
+    function drawSmallScale(originX, originY, length) {
+        ctx.beginPath();
+        ctx.moveTo(originX, originY);
+        ctx.lineTo(originX, originY + length);
+        ctx.strokeStyle = "#6e7078";
+        ctx.setLineDash([]);
+        ctx.globalAlpha = 1
+        ctx.stroke();
+        ctx.closePath();
+    }
+
+
+    function drawXScale() {
+        var scaleCount = XData.length + 1;
+        var xLength = RB.x - LB.x;
+        var scaleLength = parseInt(xLength / XData.length);
+        var startX = LB.x;
+        var startY = LB.y;
+        for (let i = 0; i < scaleCount; i++) {
+            drawSmallScale(startX, startY, 10);
+            startX += scaleLength;
+        }
+        var fixXLength = parseInt(scaleLength / 2);
+        var textX = LB.x + fixXLength;
+        var dataPosition = [];
+        for (let i = 0; i < XData.length; i++) {
+            drawXText(XData[i], textX, LB.y, X_TEXT_SIZE, scaleLength);
+            var dataXY = getDataPosition(textX, YData[i]);
+            dataPosition.push(dataXY);
+            textX += scaleLength;
+        }
+        // drawDataLine(dataPosition);
+        drawDataLineNew(dataPosition);
+        drawDataCircular(dataPosition, DATA_CIRCULAR_RADIUS);
+        drawDataRect(dataPosition, fixXLength, DATA_RECT_WIDTH);
+    }
+
+    function drawDataCircular(dataPosition, radius) {
+        for (let i = 0; i < dataPosition.length; i++) {
+            ctx.beginPath();
+            ctx.arc(dataPosition[i].x, dataPosition[i].y, radius, 0, 2 * Math.PI);
+            ctx.strokeStyle = "pink"
+            ctx.stroke();
+            ctx.closePath();
+        }
+
+    }
+
+    function getDataPosition(originX, data) {
+        var yLength = LB.y - LT.y;
+        var currentY = parseInt(yLength - data / maxY * yLength) + 50;
+
+        return {x: originX, y: currentY}
+    }
+
+    function drawXText(text, originX, originY, size) {
+        ctx.beginPath();
+        ctx.font = `${size}px Verdana`;
+        ctx.textBaseline = "top";
+        ctx.textAlign = "center";
+        ctx.fillText(text, originX, originY)
+        ctx.closePath();
+    }
+
+
+    function drawYLineScale(originX, originY, length) {
+        ctx.beginPath();
+        ctx.moveTo(originX, originY);
+        ctx.lineTo(originX + length, originY);
+        ctx.strokeStyle = "#6e7078";
+        ctx.setLineDash([10, 10]);
+        ctx.globalAlpha = 1
+        ctx.stroke();
+        ctx.closePath();
+    }
+
+    function drawYScale() {
+
+        var yLength = LB.y - LT.y;
+        var scaleLength = parseInt(yLength / Y_BLOCK_COUNT);
+        var yInterval = maxY / Y_BLOCK_COUNT;
+
+        var startX = LB.x;
+        var startY = LB.y;
+        var yText = 0;
+        for (let i = 0; i < Y_BLOCK_COUNT; i++) {
+            drawYLineScale(startX, startY - scaleLength, yLength);
+            startY -= scaleLength;
+        }
+        var textY = LB.y;
+        for (let i = 0; i < Y_BLOCK_COUNT + 1; i++) {
+            drawYText(yText, startX, textY, Y_TEXT_SIZE, scaleLength);
+            yText = parseInt(yText + yInterval);
+            textY -= scaleLength;
+        }
+
+
+    }
+
+    function drawYText(text, originX, originY, size) {
+        ctx.beginPath();
+        ctx.font = `${size}px Verdana`;
+        ctx.textBaseline = "middle";
+        ctx.textAlign = "right";
+        ctx.fillStyle = "black";
+        ctx.fillText(text, originX, originY)
+        ctx.closePath();
+    }
+
+
+    function drawDataRect(dataPosition, fixXLength, width) {
+        var yLength = LB.y - LT.y;
+        ctx.beginPath();
+        ctx.fillStyle = "orange";
+        ctx.globalAlpha = 0.5;
+        for (let i = 0; i < dataPosition.length; i++) {
+            ctx.fillRect(dataPosition[i].x - width / 2, dataPosition[i].y, width, yLength - dataPosition[i].y + PB)
+        }
+        ctx.closePath();
+    }
+
+    function drawDataLine(positionList) {
+        if (positionList.length < 1) {
+            return;
+        }
+
+        ctx.beginPath();
+        ctx.moveTo(positionList[0].x, positionList[0].y);
+        for (let i = 1; i < positionList.length; i++) {
+            ctx.lineTo(positionList[i].x, positionList[i].y);
+        }
+        ctx.strokeStyle = "skyblue"
+        ctx.lineWidth = 2;
+        ctx.globalAlpha = 1
+        ctx.stroke();
+        ctx.closePath();
+    }
+
+    function drawDataLineNew(positionList) {
+        if (positionList.length < 1) {
+            return;
+        }
+
+        var newPositionList = [];
+        for (let i = 0; i < positionList.length - 1; i++) {
+            var item = positionList[i];
+            var nextItem = positionList[i + 1];
+            var po = getPointsOnCircle(item.x, item.y, DATA_CIRCULAR_RADIUS, nextItem.x, nextItem.y, DATA_CIRCULAR_RADIUS);
+            newPositionList.push(po);
+        }
+
+        for (let i = 0; i < newPositionList.length; i++) {
+            var nPo = newPositionList[i];
+            ctx.beginPath();
+            ctx.moveTo(nPo.point1.x, nPo.point1.y);
+
+            ctx.lineTo(nPo.point2.x, nPo.point2.y);
+
+            ctx.strokeStyle = "skyblue"
+            ctx.lineWidth = 2;
+            ctx.globalAlpha = 1
+            ctx.stroke();
+            ctx.closePath();
+        }
+    }
+
+
+    function getPointsOnCircle(x1, y1, r1, x2, y2, r2) {
+        // 计算方向向量
+        const dx = x2 - x1;
+        const dy = y2 - y1;
+
+        // 计算向量的长度
+        const length = Math.sqrt(dx * dx + dy * dy);
+
+        // 计算单位向量
+        const ux = dx / length;
+        const uy = dy / length;
+
+        // 圆1上的点
+        const point1 = {
+            x: x1 + r1 * ux,
+            y: y1 + r1 * uy,
+        };
+
+        // 圆2上的点
+        const point2 = {
+            x: x2 - r2 * ux,
+            y: y2 - r2 * uy,
+        };
+
+        return {point1, point2};
+    }
+
+    // // 示例：
+    // const x1 = 0, y1 = 0, r1 = 5;
+    // const x2 = 10, y2 = 0, r2 = 5;
+    //
+    // const points = getPointsOnCircle(x1, y1, r1, x2, y2, r2);
+    // console.log(points);
+    // 输出：{ point1: { x: 5, y: 0 }, point2: { x: 5, y: 0 } }
+
+
+</script>
+</html>
