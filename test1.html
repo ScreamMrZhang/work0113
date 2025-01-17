@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>可拖动和调整大小的 Div 截图</title>
+    <style>
+        body {
+            margin: 0;
+            height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+
+        #captureArea {
+            position: absolute;
+            top: 100px;
+            left: 100px;
+            width: 200px;
+            height: 150px;
+            background: rgba(173, 216, 230, 0.3);
+            border: 2px dashed #000;
+            cursor: move;
+            resize: both;
+            overflow: hidden; /* 避免超出区域显示 */
+        }
+
+        #captureArea .resize-handle {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: #000;
+            cursor: se-resize;
+            bottom: 0;
+            right: 0;
+        }
+
+        #captureBtn {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            z-index: 1000;
+        }
+    </style>
+</head>
+<body>
+<button id="captureBtn">截取图像</button>
+<div id="captureArea">
+    <div class="resize-handle"></div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script>
+    const captureArea = document.getElementById('captureArea');
+    const captureBtn = document.getElementById('captureBtn');
+
+    // **拖动功能**
+    let isDragging = false;
+    let startX, startY, startLeft, startTop;
+
+    captureArea.addEventListener('mousedown', (e) => {
+        if (e.target.classList.contains('resize-handle')) return; // 忽略调整大小的拖动
+
+        isDragging = true;
+        startX = e.clientX;
+        startY = e.clientY;
+        startLeft = parseInt(window.getComputedStyle(captureArea).left, 10);
+        startTop = parseInt(window.getComputedStyle(captureArea).top, 10);
+
+        document.addEventListener('mousemove', onDragMove);
+        document.addEventListener('mouseup', onDragEnd);
+    });
+
+    const onDragMove = (e) => {
+        if (!isDragging) return;
+
+        const dx = e.clientX - startX;
+        const dy = e.clientY - startY;
+
+        captureArea.style.left = `${startLeft + dx}px`;
+        captureArea.style.top = `${startTop + dy}px`;
+    };
+
+    const onDragEnd = () => {
+        isDragging = false;
+        document.removeEventListener('mousemove', onDragMove);
+        document.removeEventListener('mouseup', onDragEnd);
+    };
+
+    // **调整大小功能**
+    let isResizing = false;
+    let startWidth, startHeight;
+
+    const resizeHandle = captureArea.querySelector('.resize-handle');
+    resizeHandle.addEventListener('mousedown', (e) => {
+        isResizing = true;
+        startX = e.clientX;
+        startY = e.clientY;
+        startWidth = captureArea.offsetWidth;
+        startHeight = captureArea.offsetHeight;
+
+        document.addEventListener('mousemove', onResizeMove);
+        document.addEventListener('mouseup', onResizeEnd);
+    });
+
+    const onResizeMove = (e) => {
+        if (!isResizing) return;
+
+        const dx = e.clientX - startX;
+        const dy = e.clientY - startY;
+
+        captureArea.style.width = `${startWidth + dx}px`;
+        captureArea.style.height = `${startHeight + dy}px`;
+    };
+
+    const onResizeEnd = () => {
+        isResizing = false;
+        document.removeEventListener('mousemove', onResizeMove);
+        document.removeEventListener('mouseup', onResizeEnd);
+    };
+
+    // **截图功能**
+    captureBtn.addEventListener('click', () => {
+        html2canvas(document.body, {
+            x: captureArea.offsetLeft,
+            y: captureArea.offsetTop,
+            width: captureArea.offsetWidth,
+            height: captureArea.offsetHeight
+        }).then((canvas) => {
+            const imageURL = canvas.toDataURL('image/png');
+            const img = new Image();
+            img.src = imageURL;
+            img.style.maxWidth = '100%';
+
+            // 将生成的图片添加到页面
+            const result = document.createElement('div');
+            result.innerHTML = '<h3>截取结果：</h3>';
+            result.appendChild(img);
+            document.body.appendChild(result);
+        }).catch((error) => {
+            console.error('截图失败:', error);
+        });
+    });
+</script>
+</body>
+</html>

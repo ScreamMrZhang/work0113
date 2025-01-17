@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div class="main" style="width: 50vw;height: 50vh;margin: auto"></div>
+</body>
+<script src="../lib/echarts.min.js"></script>
+<script>
+    var main = document.querySelector(".main");
+    var mainEcharts = echarts.init(main);
+    var option = {
+        legend: {},
+        series: [
+            {
+                type: 'pie',
+
+                data:[
+                    {name:"xiaomi",value:20000},
+                    {name:"huawei",value:10000},
+                    {name:"meizu",value:500},
+                    {name:"nubia",value:1000},
+                ]
+            }
+        ]
+    }
+    mainEcharts.setOption(option)
+</script>
+</html>

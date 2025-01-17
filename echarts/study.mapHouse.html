@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div class="main" style="width: 100vw;height: 100vh;margin: auto"></div>
+</body>
+<script src="../lib/jquery-3.6.0.min.js"></script>
+<script src="../lib/lodash.min.js"></script>
+<script src="../lib/axios.min.js"></script>
+<script src="../lib/echarts.min.js"></script>
+<script src="../lib/xlsx.full.min.js"></script>
+<script src="../lib/utils.js"></script>
+<script>
+    var main = document.querySelector(".main");
+    var myChart = echarts.init(main);
+
+
+    // var BASE_URL = "https://geo.datav.aliyun.com/areas_v3/bound/100000_full_city.json";
+    var BASE_URL = "https://geo.datav.aliyun.com/areas_v3/bound/100000_full.json";
+    // var BASE_URL = "https://geo.datav.aliyun.com/areas_v3/bound/152502.json";
+    axios.get(BASE_URL).then(function (res) {
+        console.log()
+        var dataMap = res.data;
+        console.log(dataMap);
+        // echarts.registerMap("abc", dataMap);
+        // var option = {
+        //     series: [{
+        //         type: 'map',
+        //         map: "abc",
+        //     }]
+        // }
+        // mainEcharts.setOption(option);
+
+        async function readExcelFile(url) {
+            var result={};
+            var file = await (await fetch(url)).arrayBuffer();
+            var workbook = XLSX.read(file);
+            // 获取工作表名
+            var sheetNames = workbook.SheetNames;  // 获取第一个工作表名
+            var sheets = sheetNames.map(function (sheetName) {
+                return workbook.Sheets[sheetName]
+            })
+            var sheetList = sheets.reduce(function (acc, sheet) {
+                acc.push(XLSX.utils.sheet_to_json(sheet))
+                return acc;
+            },[]);
+            console.log(sheetList)
+
+            // province
+            var monthData = sheetList[0].map(function (sheetName) {return sheetName.__EMPTY}).reverse()
+            result.year=monthData;
+
+            var mapData= formatterData(sheetList[0])
+            result.mapData=mapData;
+            createE(dataMap,result)
+        }
+        readExcelFile("../lib/近3年大陆各省直辖市房屋销售数据.xlsx");
+
+    })
+
+    window.onresize = _.throttle(myChart.resize, 300);
+
+    function formatterData(input) {
+        const result = input.map(item => {
+            const year = item["__EMPTY"]; // 获取年份
+            // 转换每个城市和其对应的值
+            return Object.entries(item)
+                .filter(([key]) => key !== "__EMPTY") // 排除 "__EMPTY" 字段
+                .map(([name, value]) => ({
+                    year: String(year), // 转换年份为字符串
+                    name, // 城市名称
+                    value, // 对应的值
+                }));
+        });
+
+        console.log(result);
+        return result.reverse();
+    }
+
+    function createE(dataMap,result) {
+        // var uploadedDataURL = "/asset/get/s/data-1528971808162-BkOXf61WX.json";
+
+//geoCoordMap把所有可能出现的城市加到数组里面
+//         var geoCoordMap = {
+//             "杭州": [119.5313, 29.8773],
+//             "苏州": [118.8062, 31.9208],
+//             '上海': [121.4648, 31.2891],
+//             "天津": [117.4219, 39.4189],
+//             '深圳': [114.072026, 22.552194],
+//             "成都": [103.9526, 30.7617],
+//             "郑州": [113.4668, 34.6234],
+//             "宁波": [121.640618, 29.86206],
+//             "合肥": [117.29, 32.0581],
+//             "重庆": [108.384366, 30.439702],
+//             "广州": [113.12244, 23.009505],
+//             "大连": [123.1238, 42.1216],
+//             "青岛": [117.1582, 36.8701],
+//             '北京': [116.4551, 40.2539],
+//             '义乌': [120.067209, 29.346921],
+//             '东莞': [113.764742, 23.02039],
+//             "长沙": [113.0823, 28.2568],
+//             "贵阳": [106.6992, 26.7682],
+//             '珠海': [113.556111, 22.250876],
+//             '威海': [122.109148, 37.516889],
+//             "泉州": [118.58, 24.93],
+//             "赤峰": [118.87, 42.28],
+//             "厦门": [118.1, 24.46],
+//             "福州": [119.3, 26.08],
+//             "抚顺": [123.97, 41.97],
+//             "汕头": [116.69, 23.39],
+//             "宁波": [121.56, 29.86],
+//             "海口": [110.35, 20.02],
+//             "岳阳": [113.09, 29.37],
+//             "武汉": [114.31, 30.52],
+//             "义乌": [120.06, 29.32],
+//             "唐山": [118.02, 39.63],
+//             "石家庄": [114.48, 38.03],
+//             "哈尔滨": [126.63, 45.75],
+//             "兰州": [103.73, 36.03],
+//             "贵阳": [106.71, 26.57],
+//             "呼和浩特": [111.65, 40.82],
+//             "南昌": [115.89, 28.68],
+//             "佛山": [113.11, 23.05],
+//             "汕头": [116.69, 23.39],
+//             "烟台": [121.39, 37.52],
+//             "威海": [122.1, 37.5],
+//         };
+
+        var geoCoordMap = {
+            // '台湾': [121.5135,25.0308],
+            '黑龙江省': [127.9688, 45.368],
+            '内蒙古自治区': [110.3467, 41.4899],
+            "吉林省": [125.8154, 44.2584],
+            '北京市': [116.4551, 40.2539],
+            "辽宁省": [123.1238, 42.1216],
+            "河北省": [114.4995, 38.1006],
+            "天津市": [117.4219, 39.4189],
+            "山西省": [112.3352, 37.9413],
+            "陕西省": [109.1162, 34.2004],
+            "甘肃省": [103.5901, 36.3043],
+            "宁夏回族自治区": [106.3586, 38.1775],
+            "青海省": [101.4038, 36.8207],
+            "新疆维吾尔自治区": [87.9236, 43.5883],
+            "西藏自治区": [91.11, 29.97],
+            "四川省": [103.9526, 30.7617],
+            "重庆市": [108.384366, 30.439702],
+            "山东省": [117.1582, 36.8701],
+            "河南省": [113.4668, 34.6234],
+            "江苏省": [118.8062, 31.9208],
+            "安徽省": [117.29, 32.0581],
+            "湖北省": [114.3896, 30.6628],
+            "浙江省": [119.5313, 29.8773],
+            "福建省": [119.4543, 25.9222],
+            "江西省": [116.0046, 28.6633],
+            "湖南省": [113.0823, 28.2568],
+            "贵州省": [106.6992, 26.7682],
+            "云南省": [102.9199, 25.4663],
+            "广东省": [113.12244, 23.009505],
+            "广西省": [108.479, 23.1152],
+            "海南省": [110.3893, 19.8516],
+            '上海市': [121.4648, 31.2891],
+        };
+
+
+        var colors = [
+            ["#1DE9B6", "#F46E36", "#04B9FF", "#5DBD32", "#FFC809", "#FB95D5", "#BDA29A", "#6E7074", "#546570", "#C4CCD3"],
+            ["#37A2DA", "#67E0E3", "#32C5E9", "#9FE6B8", "#FFDB5C", "#FF9F7F", "#FB7293", "#E062AE", "#E690D1", "#E7BCF3", "#9D96F5", "#8378EA", "#8378EA"],
+            ["#DD6B66", "#759AA0", "#E69D87", "#8DC1A9", "#EA7E53", "#EEDD78", "#73A373", "#73B9BC", "#7289AB", "#91CA8C", "#F49F42"],
+        ];
+        var colorIndex = 0;
+        $(function () {
+            // var year = ["2013", "2014", "2015", "2016", "2017", "2018", "2019"];
+            var year = result.year
+            var mapData = result.mapData;
+
+            /*柱子Y名称*/
+            var categoryData = [];
+            var barData = [];
+
+
+
+            console.log(111111111,mapData)
+
+            for (var i = 0; i < mapData.length; i++) {
+                mapData[i].sort(function sortNumber(a, b) {
+                    return a.value - b.value
+                });
+                barData.push([]);
+                categoryData.push([]);
+                for (var j = 0; j < mapData[i].length; j++) {
+                    barData[i].push(mapData[i][j].value);
+                    categoryData[i].push(mapData[i][j].name);
+                }
+            }
+
+            getMapData(dataMap,year,categoryData,mapData,geoCoordMap,colors,colorIndex,barData);
+
+
+        });
+
+
+    }
+
+    function getMapData(geoJson,year,categoryData,mapData,geoCoordMap,colors,colorIndex,barData) {
+
+
+        echarts.registerMap('china', geoJson);
+        var convertData = function (data) {
+            var res = [];
+            for (var i = 0; i < data.length; i++) {
+                var geoCoord = geoCoordMap[data[i].name];
+                if (geoCoord) {
+                    res.push({
+                        name: data[i].name,
+                        value: geoCoord.concat(data[i].value)
+                    });
+                }
+            }
+            return res;
+        };
+
+        optionXyMap01 = {
+            timeline: {
+                data: year,
+                axisType: 'category',
+                autoPlay: true,
+                playInterval: 3000,
+                left: '10%',
+                right: '10%',
+                bottom: '3%',
+                width: '80%',
+                progress:{
+                    label:{
+                        // show:false,
+                        interval:0,
+                        rotate:45,
+                    }
+                },
+                label: {
+                    // position: 'top',
+                    normal: {
+                        margin:10,
+                        rotate:-45,
+                        textStyle: {
+                            color: '#ddd'
+                        }
+                    },
+                    emphasis: {
+                        textStyle: {
+                            color: '#fff'
+                        }
+                    }
+                },
+                symbolSize: 10,
+                lineStyle: {
+                    color: '#555'
+                },
+                checkpointStyle: {
+                    borderColor: '#777',
+                    borderWidth: 2
+                },
+                controlStyle: {
+                    showNextBtn: true,
+                    showPrevBtn: true,
+                    normal: {
+                        color: '#666',
+                        borderColor: '#666'
+                    },
+                    emphasis: {
+                        color: '#aaa',
+                        borderColor: '#aaa'
+                    }
+                },
+
+            },
+            baseOption: {
+                animation: true,
+                animationDuration: 1000,
+                animationEasing: 'cubicInOut',
+                animationDurationUpdate: 1000,
+                animationEasingUpdate: 'cubicInOut',
+                grid: {
+                    right: '1%',
+                    top: '15%',
+                    bottom: '10%',
+                    width: '20%'
+                },
+                tooltip: {
+                    trigger: 'axis', // hover触发器
+                    axisPointer: { // 坐标轴指示器，坐标轴触发有效
+                        type: 'shadow', // 默认为直线，可选为：'line' | 'shadow'
+                        shadowStyle: {
+                            color: 'rgba(150,150,150,0.1)' //hover颜色
+                        }
+                    }
+                },
+                geo: {
+                    show: true,
+                    map: 'china',
+                    roam: true,
+                    zoom: 1,
+                    center: [113.83531246, 34.0267395887],
+                    label: {
+                        emphasis: {
+                            show: false
+                        }
+                    },
+                    itemStyle: {
+                        normal: {
+                            borderColor: 'rgba(147, 235, 248, 1)',
+                            borderWidth: 1,
+                            areaColor: {
+                                type: 'radial',
+                                x: 0.5,
+                                y: 0.5,
+                                r: 0.8,
+                                colorStops: [{
+                                    offset: 0,
+                                    color: 'rgba(147, 235, 248, 0)' // 0% 处的颜色
+                                }, {
+                                    offset: 1,
+                                    color: 'rgba(147, 235, 248, .2)' // 100% 处的颜色
+                                }],
+                                globalCoord: false // 缺省为 false
+                            },
+                            shadowColor: 'rgba(128, 217, 248, 1)',
+                            // shadowColor: 'rgba(255, 255, 255, 1)',
+                            shadowOffsetX: -2,
+                            shadowOffsetY: 2,
+                            shadowBlur: 10
+                        },
+                        emphasis: {
+                            areaColor: '#389BB7',
+                            borderWidth: 0
+                        }
+                    }
+                },
+            },
+            options: []
+
+        };
+
+        for (var n = 0; n < year.length; n++) {
+            optionXyMap01.options.push({
+                backgroundColor: '#013954',
+                title:
+                    [{
+                        text: '房屋xxx',
+                        left: '25%',
+                        top: '7%',
+                        textStyle: {
+                            color: '#fff',
+                            fontSize: 25
+                        }
+                    },
+                        {
+                            id: 'statistic',
+                            text: year[n] + "数据统计情况",
+                            left: '75%',
+                            top: '8%',
+                            textStyle: {
+                                color: '#fff',
+                                fontSize: 25
+                            }
+                        }
+                    ],
+                xAxis: {
+                    type: 'value',
+                    scale: true,
+                    position: 'top',
+                    min: 0,
+                    boundaryGap: false,
+                    splitLine: {
+                        show: false
+                    },
+                    axisLine: {
+                        show: false
+                    },
+                    axisTick: {
+                        show: false
+                    },
+                    axisLabel: {
+                        margin: 2,
+                        // rotate:45,
+                        textStyle: {
+                            color: '#aaa'
+                        }
+                    },
+                },
+                yAxis: {
+                    type: 'category',
+                    //  name: 'TOP 20',
+                    nameGap: 16,
+                    axisLine: {
+                        show: true,
+                        lineStyle: {
+                            color: '#ddd'
+                        }
+                    },
+                    axisTick: {
+                        show: false,
+                        lineStyle: {
+                            color: '#ddd'
+                        }
+                    },
+                    axisLabel: {
+                        interval: 0,
+                        textStyle: {
+                            color: '#ddd'
+                        }
+                    },
+                    data: categoryData[n]
+                },
+
+                series: [
+                    //地图
+                    {
+                        type: 'map',
+                        map: 'china',
+                        geoIndex: 0,
+                        aspectScale: 0.75, //长宽比
+                        showLegendSymbol: false, // 存在legend时显示
+                        label: {
+                            normal: {
+                                show: false
+                            },
+                            emphasis: {
+                                show: false,
+                                textStyle: {
+                                    color: '#fff'
+                                }
+                            }
+                        },
+                        roam: true,
+                        itemStyle: {
+                            normal: {
+                                areaColor: '#031525',
+                                borderColor: '#FFFFFF',
+                            },
+                            emphasis: {
+                                areaColor: '#2B91B7'
+                            }
+                        },
+                        animation: false,
+                        data: mapData
+                    },
+                    //地图中闪烁的点
+                    {
+                        //  name: 'Top 5',
+                        type: 'effectScatter',
+                        coordinateSystem: 'geo',
+                        data: convertData(mapData[n].sort(function (a, b) {
+                            return b.value - a.value;
+                        }).slice(0, 20)),
+                        symbolSize: function (val) {
+                            // console.log(val[2])
+                            return val[2] / 100>20?20:val[2] / 100;
+                        },
+                        showEffectOn: 'render',
+                        rippleEffect: {
+                            brushType: 'stroke'
+                        },
+                        hoverAnimation: true,
+                        label: {
+                            normal: {
+                                formatter: '{b}',
+                                position: 'right',
+                                show: true
+                            }
+                        },
+                        itemStyle: {
+                            normal: {
+                                color: colors[colorIndex][n],
+                                shadowBlur: 10,
+                                shadowColor: colors[colorIndex][n]
+                            }
+                        },
+                        zlevel: 1
+                    },
+                    //柱状图
+                    {
+                        zlevel: 1.5,
+                        type: 'bar',
+                        symbol: 'none',
+                        itemStyle: {
+                            normal: {
+                                color: colors[colorIndex][n]
+                            }
+                        },
+                        data: barData[n]
+                    }
+                ]
+            })
+        }
+        myChart.setOption(optionXyMap01);
+    }
+
+</script>
+</html>

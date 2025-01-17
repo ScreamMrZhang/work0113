@@ -3,8 +3,212 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+        }
+        .outer{
+            width: 80vw;
+            height: 70vh;
+            border: 1px solid black;
+            margin: auto;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+        }
+        .drawArea{
+            width: 90%;
+            height: 90%;
+            border: 1px dotted black;
+            text-align: center;
+            line-height: 20vh;
+            font-size: 5vh;
+            position: relative;
+        }
+        .drawArea img{
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        #captureArea {
+            position: absolute;
+            top: 100px;
+            left: 100px;
+            width: 200px;
+            height: 150px;
+            background: rgba(173, 216, 230, 0.3);
+            border: 2px dashed #000;
+            cursor: move;
+            resize: both;
+            z-index: 5;
+            overflow: hidden;
+        }
+    </style>
 </head>
 <body>
+<!--<div class="test"></div>-->
+<div class="outer">
+    <div class="drawArea">
 
+        <p>+</p>
+        <p>请添加上传文件</p>
+
+    </div>
+    <div>
+        <input type="file">
+        <button class="download">下载</button>
+        <button id="captureBtn">截取图像</button>
+    </div>
+</div>
 </body>
+<script src="./lib/html2canvas.min.js"></script>
+<script>
+
+    var ctx = null;
+
+    var drawArea = document.querySelector(".drawArea");
+    var captureArea = null;
+    var captureBtn = document.getElementById('captureBtn');
+
+    (function (window, document) {
+
+
+        window.charts = {
+            init: function (el) {
+                // 获取dom节点
+                if (typeof el === "string") {
+                    el = document.querySelector(el);
+                }
+                if (!(el instanceof HTMLElement)) {
+                    throw new Error("Expected a valid HTML element");
+                }
+                var elStyleInfo = window.getComputedStyle(drawArea);
+                var width = parseInt(elStyleInfo.width);
+                var height = parseInt(elStyleInfo.height);
+                var dpr = window.devicePixelRatio;
+                var canvas = document.createElement("canvas");
+                canvas.width = width * dpr;
+                canvas.height = height * dpr;
+                canvas.style.cssText = `transform-origin: 0 0;transform: scale(${1 / dpr})`;
+                ctx = canvas.getContext("2d");
+                ctx.scale(dpr, dpr);
+                el.parentElement.replaceChild(canvas, el)
+                return this;
+            },
+            drawImage: function (image) {
+                ctx.drawImage(image, 0, 0,image.width,image.height,0,0,image.width,image.height);
+                return this;
+            }
+        }
+    })(window, document)
+
+    var img = new Image();
+
+
+    var upload = document.querySelector("input[type=file]");
+    upload.addEventListener("change", function () {
+        var file = this.files[0];
+        var url = URL.createObjectURL(file);
+        img.src = url;
+
+        img.onload = function () {
+            drawArea.innerHTML = `<i class="baz"></i>`;
+            var width = parseInt(window.getComputedStyle(drawArea).width);
+            var height = parseInt(window.getComputedStyle(drawArea).height);
+
+            var imgWidth = img.width;
+            console.log(imgWidth)
+            if (imgWidth>width) {
+                img.style.cssText=`width:${width}px;`;
+            }
+
+            var fragment = document.createDocumentFragment();
+            fragment.appendChild(img);
+            captureArea = document.createElement("div");
+            captureArea.id="captureArea";
+            fragment.appendChild(captureArea)
+            drawArea.appendChild(fragment);
+
+            captureArea.addEventListener('mousedown', (e) => {
+                // if (e.target.classList.contains('resize-handle')) return; // 忽略调整大小的拖动
+                console.dir(e.target)
+                console.dir(e)
+                isDragging = true;
+                startX = e.clientX;
+                startY = e.clientY;
+                startLeft = parseInt(window.getComputedStyle(captureArea).left);
+                startTop = parseInt(window.getComputedStyle(captureArea).top);
+                // startLeft = e.target.offsetLeft;
+                // startTop = e.target.offsetTop;
+
+                document.addEventListener('mousemove', onDragMove);
+                document.addEventListener('mouseup', onDragEnd);
+            });
+
+
+        }
+    })
+
+
+
+    // **拖动功能**
+    var isDragging = false;
+    var startX, startY, startLeft, startTop;
+
+    var onDragMove = function (e) {
+        if (!isDragging) return;
+
+        var dx = e.clientX - startX;
+        var dy = e.clientY - startY;
+
+        captureArea.style.left = `${startLeft + dx}px`;
+        captureArea.style.top = `${startTop + dy}px`;
+    };
+
+    var onDragEnd = function ()  {
+        isDragging = false;
+        document.removeEventListener('mousemove', onDragMove);
+        document.removeEventListener('mouseup', onDragEnd);
+
+    };
+
+    captureBtn.addEventListener('click', () => {
+        var rect = captureArea.getBoundingClientRect();
+        console.log(rect);
+        html2canvas(document.body, {
+            // x: captureArea.offsetLeft,
+            // y: captureArea.offsetTop,
+            x: rect.x+4,
+            y: rect.y-8,
+            width: rect.width-8,
+            height: rect.height-8,
+            ignoreElements: (captureArea) => false,
+        }).then((canvas) => {
+            var imageURL = canvas.toDataURL('image/png');
+            var img = new Image();
+            img.src = imageURL;
+            // img.style.maxWidth = '100%';
+
+            // 将生成的图片添加到页面
+            var result = document.createElement('div');
+            result.innerHTML = '<h3>截取结果：</h3>';
+            result.appendChild(img);
+            document.body.appendChild(result);
+        }).catch((error) => {
+            console.error('截图失败:', error);
+        });
+    });
+
+
+
+
+
+
+
+
+
+</script>
 </html>

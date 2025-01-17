@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div class="main" style="width: 100vw;height: 100vh;margin: auto"></div>
+</body>
+<script src="../lib/papaparse.min.js"></script>
+<script src="../lib/echarts.min.js"></script>
+<script src="../lib/lodash.min.js"></script>
+<script>
+    var output =null;
+    // 指定 CSV 文件的路径
+    var csvUrl = '../lib/19920401-20241130.csv';
+
+
+    var main = document.querySelector(".main");
+    var mainEcharts = echarts.init(main);
+
+    // 使用 Papa.parse 解析 CSV 文件
+    Papa.parse(csvUrl, {
+        download: true, // 表示需要下载文件
+        // header: true,   // 如果第一行是标题行，解析为对象
+        skipEmptyLines: true, // 跳过空行
+        complete: (results) => {
+            // console.log('解析完成:', results.data);
+            // output = JSON.stringify(results.data);
+            output = results.data.slice(2)
+            console.log("11111",output)
+
+            // 执行转换
+            output = convertArray(output);
+            createE();
+        },
+        error: (error) => {
+            console.error('解析出错:', error);
+            document.getElementById('output').textContent = '解析出错: ' + error.message;
+        }
+    });
+
+    // 转换函数
+    var convertArray = (array) => {
+        return array.map(row => {
+            var [year, month, day, value] = row;
+            var timestamp = new Date(year, month - 1, day).getTime();
+            return [timestamp, value];
+        });
+    };
+
+
+    function createE() {
+        var option = {
+            tooltip: {
+                trigger: 'axis',
+                position: function (pt) {
+                    return [pt[0], '10%'];
+                }
+            },
+            title: {
+                left: 'center',
+                text: 'Large Ara Chart'
+            },
+            toolbox: {
+                feature: {
+                    dataZoom: {
+                        yAxisIndex: 'none'
+                    },
+                    restore: {},
+                    saveAsImage: {}
+                }
+            },
+            xAxis: {
+                type: 'time',
+                boundaryGap: false
+            },
+            yAxis: {
+                type: 'value',
+                boundaryGap: [0, '100%']
+            },
+            dataZoom: [
+                {
+                    type: 'inside',
+                    start: 0,
+                    end: 20
+                },
+                {
+                    start: 0,
+                    end: 20
+                }
+            ],
+            series: [
+                {
+                    name: 'Fake Data',
+                    type: 'line',
+                    smooth: true,
+                    symbol: 'none',
+                    areaStyle: {},
+                    data: output
+                }
+            ]
+        };
+        mainEcharts.setOption(option);
+    }
+
+
+    window.onresize = _.throttle(mainEcharts.resize,300);
+
+</script>
+</html>

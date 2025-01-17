@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div class="main" style="width: 100vw;height: 100vh;margin: auto"></div>
+</body>
+<script src="../lib/lodash.min.js"></script>
+<script src="../lib/axios.min.js"></script>
+<script src="../lib/echarts.min.js"></script>
+<script>
+    var main = document.querySelector(".main");
+    var mainEcharts = echarts.init(main);
+
+
+
+    var BASE_URL = "https://geo.datav.aliyun.com/areas_v3/bound/100000_full_city.json";
+    // var BASE_URL = "https://geo.datav.aliyun.com/areas_v3/bound/152502.json";
+    axios.get(BASE_URL).then(function(res) {
+        console.log()
+        var dataMap = res.data;
+        console.log(dataMap);
+        echarts.registerMap("abc",dataMap);
+
+        var option = {
+            series: [{
+                type: 'map',
+                map: "abc",
+
+            }]
+
+        }
+
+        mainEcharts.setOption(option);
+
+
+    })
+
+    window.onresize = _.throttle(mainEcharts.resize,300);
+
+</script>
+</html>

@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+        .content{
+            width: 100vw;
+            height: 100vh;
+            text-align: center;
+            line-height: 100vh;
+            font-size: 5vw;
+        }
+
+    </style>
+</head>
+<body>
+<div class="content">
+    <span id="element"></span>
+</div>
+</body>
+<script src="../lib/typed.umd.js"></script>
+<script>
+    var typed = new Typed('#element', {
+        strings: [
+            "大家好，我是渣渣辉",
+            "大家好，这里是中国",
+            "大家好，我在测试打字机效果",
+        ],
+        typeSpeed: 50,
+        backSpeed: 50,
+        loop: true,
+        smartBackspace : true ,
+
+        // fadeOut : true ,
+        // fadeOutClass : 'typed-fade-out' ,
+        // fadeOutDelay : 500
+    });
+</script>
+</html>

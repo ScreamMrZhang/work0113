@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>解析 XLSX 文件</title>
+
+</head>
+<body>
+<div class="main" style="width: 100vw;height: 100vh;border:1px solid orangered"></div>
+</body>
+<script src="../lib/xlsx.full.min.js"></script>
+<script src="../lib/echarts.min.js"></script>
+<script>
+    var BASE_FILE = "../lib/近13年甲乙类传染病发病人数与死亡人数.xlsx";
+
+    var main = document.querySelector('.main');
+    var myE = echarts.init(main);
+    async function parseFile(url) {
+
+        var file = await (await fetch(url)).arrayBuffer();
+
+        var workbook = XLSX.read(file);
+
+        // 获取工作表名
+        var sheetNames = workbook.SheetNames;  // 获取第一个工作表名
+        var sheets = sheetNames.map(function (sheetName) {
+            return workbook.Sheets[sheetName]
+        })
+        // console.log(sheets)
+        // 将工作表转换为 JSON 格式
+        // const json = XLSX.utils.sheet_to_json(sheet);
+        var sheetList = sheets.reduce(function (acc, sheet) {
+            acc.push(XLSX.utils.sheet_to_json(sheet))
+            return acc;
+        },[]);
+        var result =dataClear(sheetList)
+        createE(result)
+
+    }
+
+    function dataClear(sheetList) {
+        var result={}
+        var databeast ={};
+        var databeauty={};
+        console.log("111111",sheetList)
+        var firstItems=sheetList.reduce(function(acc,sheet) {
+            var items=sheet.map(function (item) {
+                return item.__EMPTY.replace(/死亡人数\(人\)/, "");
+            })
+            acc.push(items);
+            return acc
+        },[])
+        console.log(sheetList)
+        // 合并数组
+        var combinedArray = [...firstItems[0], ...firstItems[1]];
+        var uniqueArray = combinedArray.filter((item, index) => combinedArray.indexOf(item) === index);
+        console.log(uniqueArray)
+
+
+        for (let year = 2011; year <= 2023; year++) {
+            databeast[year] = []; // 初始化每年的数组
+
+            // 遍历顺序数组，按顺序查找对应疾病数据
+            for (let disease of uniqueArray) {
+                // 在 dataArray 中找到对应疾病的数据
+                const diseaseData = sheetList[0].find(item => item["__EMPTY"] === disease+"死亡人数(人)");
+
+                // 如果找到疾病数据，取对应年份的值，否则填入 null
+                databeast[year].push(diseaseData ? diseaseData[year] : "***");
+            }
+        }
+        for (let year = 2011; year <= 2023; year++) {
+            databeauty[year] = []; // 初始化每年的数组
+
+            // 遍历顺序数组，按顺序查找对应疾病数据
+            for (let disease of uniqueArray) {
+                // 在 dataArray 中找到对应疾病的数据
+                const diseaseData = sheetList[1].find(item => item["__EMPTY"] === disease);
+
+                // 如果找到疾病数据，取对应年份的值，否则填入 null
+                databeauty[year].push(diseaseData ? diseaseData[year] : "***");
+            }
+        }
+        result.databeast=databeast;
+        result.databeauty=databeauty;
+        result.myData=uniqueArray;
+        console.log(result)
+        return result;
+    }
+
+
+    function createE(result) {
+        //------------------------------------引用请注明出处
+
+        var myData = result.myData;
+        var databeast = result.databeast;
+        var databeauty = result.databeauty;
+        var timeLineData = ['2011','2012','2013','2014','2015','2016','2017','2018','2019','2020','2021','2022','2023'];
+
+        option = {
+            baseOption: {
+                backgroundColor: '#000',
+                timeline: {
+                    show: true,
+                    axisType: 'category',
+                    tooltip: {
+                        show: true,
+                        formatter: function(params) {
+                            console.log(params);
+                            return params.name + '月份数据统计';
+                        }
+                    },
+                    autoPlay: true,
+                    currentIndex: 0,
+                    playInterval: 2000,
+                    label: {
+                        normal: {
+                            show: true,
+                            interval: 'auto',
+                            formatter: '{value}年',
+                        },
+                    },
+                    data: [],
+                },
+                title: {
+
+                    textStyle: {
+                        color: '#fff',
+                        fontSize: 16,
+                    },
+
+                },
+                legend: {
+                    data: ['死亡人数', '感染人数'],
+                    top: 4,
+                    right: '20%',
+                    textStyle: {
+                        color: '#fff',
+                    },
+                },
+                tooltip: {
+                    show: true,
+                    trigger: 'axis',
+                    formatter: '{b}<br/>{a}: {c}人',
+                    axisPointer: {
+                        type: 'shadow',
+                    }
+                },
+
+                toolbox:{
+                    right:20,
+                    feature:{
+                        saveAsImage: {},
+                        restore: {},
+                        dataView: {},
+                        dataZoom: {},
+                        magicType: {
+                            type:['line','bar']
+                        },
+                        // brush: {},
+                    }
+                },
+
+                grid: [{
+                    show: false,
+                    left: '4%',
+                    top: 60,
+                    bottom: 60,
+                    containLabel: true,
+                    width: '40%',
+                }, {
+                    show: false,
+                    left: '50.5%',
+                    top: 80,
+                    bottom: 60,
+                    width: '0%',
+                }, {
+                    show: false,
+                    right: '4%',
+                    top: 60,
+                    bottom: 60,
+                    containLabel: true,
+                    width: '40%',
+                }, ],
+
+                xAxis: [
+                    {
+                        type: 'value',
+                        inverse: true,
+                        axisLine: {
+                            show: false,
+                        },
+                        axisTick: {
+                            show: false,
+                        },
+                        position: 'top',
+                        axisLabel: {
+                            show: true,
+                            textStyle: {
+                                color: '#B2B2B2',
+                                fontSize: 12,
+                            },
+                        },
+                        splitLine: {
+                            show: true,
+                            lineStyle: {
+                                color: '#1F2022',
+                                width: 1,
+                                type: 'solid',
+                            },
+                        },
+                    }, {
+                        gridIndex: 1,
+                        show: false,
+                    }, {
+                        gridIndex: 2,
+                        type: 'value',
+                        axisLine: {
+                            show: false,
+                        },
+                        axisTick: {
+                            show: false,
+                        },
+                        position: 'top',
+                        axisLabel: {
+                            show: true,
+                            textStyle: {
+                                color: '#B2B2B2',
+                                fontSize: 12,
+                            },
+                        },
+                        splitLine: {
+                            show: true,
+                            lineStyle: {
+                                color: '#1F2022',
+                                width: 1,
+                                type: 'solid',
+                            },
+                        },
+                    }, ],
+                yAxis: [{
+                    type: 'category',
+                    inverse: true,
+                    position: 'right',
+                    axisLine: {
+                        show: false
+                    },
+                    axisTick: {
+                        show: false
+                    },
+                    axisLabel: {
+                        show: false,
+                        margin: 8,
+                        textStyle: {
+                            color: '#9D9EA0',
+                            fontSize: 12,
+                        },
+
+                    },
+                    data: myData,
+                }, {
+                    gridIndex: 1,
+                    type: 'category',
+                    inverse: true,
+                    position: 'left',
+                    axisLine: {
+                        show: false
+                    },
+                    axisTick: {
+                        show: false
+                    },
+                    axisLabel: {
+                        show: true,
+                        textStyle: {
+                            color: '#9D9EA0',
+                            fontSize: 12,
+                        },
+
+                    },
+                    data: myData.map(function(value) {
+                        return {
+                            value: value,
+                            textStyle: {
+                                align: 'center',
+                            }
+                        }
+                    }),
+                }, {
+                    gridIndex: 2,
+                    type: 'category',
+                    inverse: true,
+                    position: 'left',
+                    axisLine: {
+                        show: false
+                    },
+                    axisTick: {
+                        show: false
+                    },
+                    axisLabel: {
+                        show: false,
+                        textStyle: {
+                            color: '#9D9EA0',
+                            fontSize: 12,
+                        },
+
+                    },
+                    data: myData,
+                }, ],
+                series: [],
+
+            },
+
+            options: [],
+
+
+        };
+
+        for (var i = 0; i < timeLineData.length; i++) {
+            option.baseOption.timeline.data.push(timeLineData[i]);
+            option.options.push({
+                title: {
+                    text: '在' + timeLineData[i] + '年甲乙类传染病人数统计',
+                },
+                series: [{
+                    name: '死亡人数',
+                    type: 'bar',
+                    barGap: 20,
+                    barWidth: 20,
+                    label: {
+                        normal: {
+                            show: false,
+                        },
+                        emphasis: {
+                            show: true,
+                            position: 'left',
+                            offset: [0, 0],
+                            textStyle: {
+                                color: '#fff',
+                                fontSize: 14,
+                            },
+                        },
+                    },
+                    itemStyle: {
+                        normal: {
+                            color: '#F68989',
+                        },
+                        emphasis: {
+                            color: '#F94646',
+                        },
+
+                    },
+                    data: databeast[timeLineData[i]],
+                },
+
+
+                    {
+                        name: '感染人数',
+                        type: 'bar',
+                        barGap: 20,
+                        barWidth: 20,
+                        xAxisIndex: 2,
+                        yAxisIndex: 2,
+                        label: {
+                            normal: {
+                                show: false,
+                            },
+                            emphasis: {
+                                show: true,
+                                position: 'right',
+                                offset: [0, 0],
+                                textStyle: {
+                                    color: '#fff',
+                                    fontSize: 14,
+                                },
+                            },
+                        },
+                        itemStyle: {
+                            normal: {
+                                color: '#659F83',
+                            },
+                            emphasis: {
+                                color: '#08C7AE',
+                            },
+                        },
+                        data: databeauty[timeLineData[i]],
+                    }
+                ]
+            });
+        }
+        myE.setOption(option)
+
+    }
+    parseFile(BASE_FILE);
+
+</script>
+</html>
