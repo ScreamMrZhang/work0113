@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        body{
+            background: black;
+        }
+    </style>
+</head>
+<body>
+<div class="main" id="myChart" style="width: 100vw;height: 100vh;margin: auto"></div>
+</body>
+<script src="../lib/jquery-3.6.0.min.js"></script>
+<script src="../lib/axios.min.js"></script>
+<script src="../lib/echarts.min.js"></script>
+<script>
+    var main = document.querySelector("#myChart");
+    var myChart = echarts.init(main);
+
+    // let baseTexture= require("https://www.isqqw.com/asset/assets/imgs/centerMarkIms/mapImg2.png")
+    // let domImg= require("https://www.isqqw.com/asset/assets/imgs/centerMarkIms/mapImg3.png")
+    let baseTexture= "../Earth.png";
+    let domImg= null;
+    let cityData = [
+        {
+            name: "智利",
+            value: [-72.46245121585589, -44.28452280412797],
+        },
+        {
+            name: "美国",
+            value: [-95.712891, 37.09024],
+        },
+        {
+            name: "新加坡",
+            value: [103.65019531249999, 1.325537109374991],
+        },
+        {
+            name: "巴西",
+            value: [-59.854394531249997, 3.5875],
+        },
+        {
+            name: "日本",
+            value: [137.5021650999999, 34.6937378],
+        },
+        {
+            name: "澳大利亚",
+            value: [144.53, -25.57],
+        },
+        {
+            name: "孟加拉国",
+            value: [90.11962890625003, 25.21997070312497],
+        },
+        {
+            name: "俄罗斯",
+            value: [97.13055582863024, 66.901646276725],
+        },
+        {
+            name: "迪拜",
+            value: [56.38798828125002, 24.97919921875004],
+        },
+        {
+            name: "越南",
+            value: [104.1647460937501, 20.94873046875003],
+        },
+        {
+            name: "印尼",
+            value: [96.49257812500005, 5.229345703124991],
+        },
+        {
+            name: "韩国",
+            value: [126.87207031249997, 36.82446289062506],
+        },
+        {
+            name: "中国台湾",
+            value: [121.57463, 25.04094],
+        },
+        {
+            name: "印度",
+            value: [78.96288, 20.593684],
+        },
+    ]
+    let  airData = [
+        // 智利到美国
+        [
+            [-72.46245121585589, -44.28452280412797],
+            [-95.712891, 37.09024],
+        ],
+        // 智利到新加披
+        [
+            [-72.46245121585589, -44.28452280412797],
+            [103.65019531249999, 1.325537109374991],
+        ],
+
+        // 巴西到日本
+        [
+            [-59.854394531249997, 3.5875],
+            [137.5021650999999, 34.6937378],
+        ],
+        // 澳大利亚到孟加拉国
+        [[144.53, -25.57], [90.11962890625003, 25.21997070312497]],
+        // 俄罗斯到迪拜
+        [
+            [97.13055582863024, 66.901646276725],
+            [56.38798828125002, 24.97919921875004],
+        ],
+        // 越南到美国
+        [
+            [104.1647460937501, 20.94873046875003],
+            [-95.712891, 37.09024],
+        ],
+        // 印尼到美国
+        [
+            [96.49257812500005, 5.229345703124991],
+            [-95.712891, 37.09024],
+        ],
+        // 中国台湾到日本
+        [
+            [121.57463, 25.04094],
+            [137.5021650999999, 34.6937378],
+        ],
+        // 中国台湾到美国
+        [
+            [121.57463, 25.04094],
+            [-95.712891, 37.09024],
+        ],
+        // 美国到印度
+        [
+            [-95.712891, 37.09024],
+            [78.96288, 20.593684],
+        ],
+        // 澳大利亚到美国
+        [
+            [144.53, -25.57],
+            [-95.712891, 37.09024],
+        ],
+    ]
+    option = {
+        tooltip: {
+            trigger: "item",
+        },
+        globe: {
+            rotate: 20,
+            baseTexture: "../Earth.png", // 基础纹理
+            globeRadius: 120, // 球面半径
+            // heightTexture: '',
+            heightTexture: baseTexture,
+            shading: "lambert",
+            light: {
+                ambient: {
+                    intensity: 1
+                },
+                main: {
+                    intensity: 0.5
+                }
+            },
+            atmosphere: { show: true, },
+            viewControl: {
+                alpha: 30,
+                beta: 160,
+                autoRotate: true, // 开启自动旋转
+                autoRotateAfterStill: 10,
+                distance: 240,
+                // rotateSensitivity: 0,
+                autoRotateSpeed: 9,
+                zoomSensitivity: 0,
+                animation: true,
+                animationDurationUpdate: 2000,
+                animationEasingUpdate: "cubicInOut",
+            },
+
+        },
+        series: [
+            {
+                type: 'lines3D',
+                coordinateSystem: 'globe',
+                blendMode: 'lighter',
+                effect: {
+                    show: true,
+                    trailWidth: 3,
+                    trailLength: 0.5,
+                    trailOpacity: 1,
+                    trailColor: '#2F98B6'
+                },
+                lineStyle: {
+                    width: 3,
+                    color: '#75D6EB',
+                    opacity: 0.2
+                },
+                data: airData
+            },
+            {
+                type: 'scatter3D',
+                coordinateSystem: 'globe',
+                blendMode: 'lighter',
+                symbolSize: 16, // 点位大小
+                itemStyle: {
+                    color: '#FE9A49', // 各个点位的颜色设置
+                    opacity: 1, // 透明度
+                    borderWidth: 1, // 边框宽度
+                    borderColor: 'rgba(255,255,255,0.8)' //rgba(180, 31, 107, 0.8)
+                },
+                label: {
+                    show: true, // 是否显示字体
+                    position: 'left', // 字体位置。top、left、right、bottom
+                    formatter: '{b}', // 具体显示的值
+                    textStyle: {
+                        backgroundColor: '#0F2232',
+                        color: '#fff', // 字体颜色
+                        borderWidth: 0, // 字体边框宽度
+                        borderColor: '#fff', // 字体边框颜色
+                        fontSize: 28, // 字体大小
+                        fontWeight: 700 // 字体加粗
+                    }
+                },
+                data: cityData
+            }
+        ]
+    }
+    myChart.setOption(option)
+
+</script>
+</html>

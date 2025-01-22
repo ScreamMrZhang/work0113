@@ -1,0 +1,210 @@
+*{
+    margin: 0;
+    padding: 0;
+}
+@font-face {
+    font-family: 'Pang';
+    src: url('../fonts/Pang.ttf') format('truetype');
+}
+@font-face {
+    font-family: 'myBlack';
+    src: url('../fonts/black.ttf') format('truetype');
+}
+@font-face {
+    font-family: 'Oswald';
+    src: url('../fonts/Oswald-Regular.ttf') format('truetype');
+}
+.container{
+    width: 2000px;
+    height: 750px;
+    background-color: black;
+    margin: 0 auto;
+    overflow: hidden;
+    position: relative;
+}
+.main,.bg{
+    width: 2000px;
+    height: 750px;
+}
+.main{
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    z-index: 80;
+    display: flex;
+
+}
+.bg{
+    position: relative;
+}
+.nav{
+    flex: 1 1 auto;
+    height: 91px;
+}
+.bg-title{
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 90;
+    width: 2000px;
+    height: 91px;
+    font-family: Pang;
+    text-align: center;
+    display: flex;
+    background-image: url("../images/T.png");
+}
+.bg-title-basic{
+    height: 91px;
+    flex: 1 1 auto;
+    display: flex;
+    color: #4f76a0;
+    font-size: 23px;
+    letter-spacing: 3px;
+    font-family: myBlack;
+    justify-content: space-between;
+}
+.bg-title-left-left{
+    line-height: 32px;
+}
+.bg-title-left-middle{
+    line-height: 58px;
+}
+.bg-title-left-right{
+    line-height: 82px;
+}
+.bg-title-right-left{
+    line-height: 82px;
+}
+.bg-title-right-middle{
+    line-height: 58px;
+}
+.bg-title-right-right{
+    line-height: 32px;
+}
+.bg-title-font{
+    width: 980px;
+    font-size: 37px;
+    line-height: 52px;
+    letter-spacing: 4px;
+    background: linear-gradient(to bottom, white, #22cbed);
+    -webkit-background-clip: text; /* 将背景裁剪到文字区域 */
+    -webkit-text-fill-color: transparent;
+}
+.bg-footer{
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 19;
+    width: 2000px;
+    height: 62px;
+    font-family: myBlack;
+    font-size: 27px;
+    line-height: 85px;
+    text-align: center;
+    color: white;
+    background-image: url("../images/D.png");
+}
+.bg-top{
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    z-index: 9;
+}
+.bg-bottom{
+    perspective: 500px;
+}
+.bg-bottom>video{
+    transform: rotate3d(1,0,0,70deg);
+}
+.main-item{
+    height: 750px;
+    flex: 1;
+}
+.center{
+    width: 980px;
+    flex: unset;
+    position: relative;
+}
+.left{
+
+}
+.panel{
+
+    line-height: 52px;
+    font-family: Oswald;
+    color: #73ecf6;
+    font-size: 23px;
+    letter-spacing: 4px;
+    position: absolute;
+}
+.panelBg-left{
+    width: 107px;
+    height: 346px;
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translate(0,-50%);
+    background-image: url("../images/3/L.png");
+}
+.panelBg-right{
+    width: 107px;
+    height: 346px;
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translate(0,-50%);
+    background-image: url("../images/3/R.png");
+}
+.panelTopLeft{
+    width: 273px;
+    height: 61px;
+    top: 25%;
+    left: 25%;
+    text-indent: 129px;
+    transform: translate(-45%,-25%);
+    background-image: url("../images/3/topLeft.png");
+}
+.panelTopRight{
+    width: 274px;
+    height: 60px;
+    top: 25%;
+    right: 25%;
+    text-indent: 129px;
+    transform: translate(45%,-25%);
+    background-image: url("../images/3/topRight.png");
+}
+.panelCenter{
+    width: 332px;
+    height: 61px;
+    top: 50%;
+    left: 50%;
+    text-indent: 150px;
+    transform: translate(-50%,-50%);
+    background-image: url("../images/3/center.png");
+}
+.panelBottomLeft{
+    line-height: 72px;
+    width: 274px;
+    height: 60px;
+    bottom: 25%;
+    left: 25%;
+    text-indent: 136px;
+    transform: translate(-45%,25%);
+    background-image: url("../images/3/bottomLeft.png");
+}
+.panelBottomRight{
+    line-height: 72px;
+    width: 274px;
+    height: 61px;
+    bottom: 25%;
+    right: 25%;
+    text-indent: 147px;
+    transform: translate(45%,25%);
+    background-image: url("../images/3/bottomRight.png");
+}
