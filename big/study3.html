@@ -9,7 +9,37 @@
 <div class="container">
     <div class="main">
         <div class="main-item left">
+            <div class="left-basic left-top">
+                <div class="left-title">资产负债率</div>
+                <div class="left-top-content">
+                    <div class="left-top-content-left">
+                        <div class="left-top-content-left-left">
+                            <div>87%</div>
+                        </div>
+                        <div class="left-top-content-left-right">
+                            <div></div>
+                            <div></div>
+                        </div>
+                    </div>
 
+                    <div class="left-top-content-right">
+                        <div></div>
+                        <div>
+                            <span>1,483</span>
+                            <span>亿</span>
+                        </div>
+                        <div>负债金额</div>
+                    </div>
+                </div>
+            </div>
+            <div class="left-basic left-center">
+                <div class="left-title">总资产周转率</div>
+                <div id="left-center" style="width: 100%;height: 100%"></div>
+            </div>
+            <div class="left-basic left-bottom">
+                <div class="left-title">银行账户分布</div>
+                <div id="left-bottom" style="width: 100%;height: 100%"></div>
+            </div>
         </div>
         <div class="main-item center">
             <div class="panelBg-left"></div>
@@ -21,23 +51,50 @@
             <div class="panelBg-right"></div>
         </div>
         <div class="main-item right">
-
+            <div class="right-basic right-top">
+                <div class="right-title"><span>重点关注</span></div>
+                <div class="right-top-content" style="width: 100%;height: 100%">
+                    <div class="right-top-left">
+                        <div id="right-top" style="width: 100%;height: 100%"></div>
+                        <div>
+                            <div class="blueBall1"></div>
+                            <div class="blueBall2"></div>
+                            <div class="yellowBall1"></div>
+                            <div class="yellowBall2"></div>
+                        </div>
+                    </div>
+                    <div class="right-top-right">
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                    </div>
+                </div>
+            </div>
+            <div class="right-basic right-center">
+                <div id="right-center" style="width: 100%;height: 100%"></div>
+            </div>
+            <div class="right-basic right-bottom">
+                <div class="right-title"><span>收入分析</span></div>
+                <div id="right-bottom" style="width: 100%;height: 100%"></div>
+            </div>
         </div>
     </div>
+
+
     <div class="bg">
         <div class="bg-title">
             <div class="bg-title-basic bg-title-left">
-                <div class="nav bg-title-left-left">国资总览</div>
-                <div class="nav bg-title-left-middle">投资管理</div>
-                <div class="nav bg-title-left-right">经济运行</div>
+                <div class="nav bg-title-left-left"><a>国资总览</a></div>
+                <div class="nav bg-title-left-middle"><a>投资管理</a></div>
+                <div class="nav bg-title-left-right"><a href="study3.html" style="color: white">经济运行</a></div>
             </div>
             <div class="bg-title-font">
                 <span>数字企业大数据监管平台</span>
             </div>
             <div class="bg-title-basic bg-title-right">
-                <div class="nav bg-title-right-left">三重一大</div>
-                <div class="nav bg-title-right-middle">党建管理</div>
-                <div class="nav bg-title-right-right">风险分析</div>
+                <div class="nav bg-title-right-left"><a>三重一大</a></div>
+                <div class="nav bg-title-right-middle"><a>党建管理</a></div>
+                <div class="nav bg-title-right-right"><a>风险分析</a></div>
             </div>
 
         </div>
@@ -55,7 +112,9 @@
 </div>
 
 </body>
-
+<script src="../lib/lodash.min.js"></script>
+<script src="../lib/echarts.min.js"></script>
+<script src="../lib/echarts-liquidfill.min.js"></script>
 <script src="./assets/js/index.js"></script>
 <script src="assets/js/study3.js"></script>
 </html>
