@@ -2,479 +2,89 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>3D Radar Chart on X-Y Plane</title>
+    <script src="../lib/lodash.min.js"></script>
+    <script src="../lib/axios.min.js"></script>
+    <script src="../lib/echarts.min.js"></script>
+    <script src="../lib/echarts-liquidfill.min.js"></script>
+    <script src="../lib/echarts-gl.min.js"></script>
 </head>
 <body>
 <div class="main" style="width: 900px;height: 600px;margin: auto;border:1px solid black"></div>
-</body>
-<script src="../lib/lodash.min.js"></script>
-<script src="../lib/axios.min.js"></script>
-<script src="../lib/echarts.min.js"></script>
-<script src="../lib/echarts-liquidfill.min.js"></script>
-<script src="../lib/echarts-gl.min.js"></script>
 <script>
     var main = document.querySelector(".main");
     var myChart = echarts.init(main);
 
-
-    const CubeLeft = echarts.graphic.extendShape({
-        shape: {
-            x: 0,
-            y: 0
-        },
-        buildPath: function (ctx, shape) {
-            const xAxisPoint = shape.xAxisPoint
-            const c0 = [shape.x, shape.y]//右上
-            const c1 = [shape.x - 25, shape.y - 4]//左上
-            const c2 = [xAxisPoint[0] - 25, xAxisPoint[1] - 4]//坐下
-            const c3 = [xAxisPoint[0], xAxisPoint[1]]//右下
-            ctx.moveTo(c0[0], c0[1]).lineTo(c1[0], c1[1]).lineTo(c2[0], c2[1]).lineTo(c3[0], c3[1]).closePath()
-        }
-    })
-    const CubeRight = echarts.graphic.extendShape({
-        shape: {
-            x: 0,
-            y: 0
-        },
-        buildPath: function (ctx, shape) {
-            const xAxisPoint = shape.xAxisPoint
-            const c1 = [shape.x, shape.y]
-            const c2 = [xAxisPoint[0], xAxisPoint[1]]
-            const c3 = [xAxisPoint[0] + 10, xAxisPoint[1] - 4]
-            const c4 = [shape.x + 10, shape.y - 4]
-            ctx.moveTo(c1[0], c1[1]).lineTo(c2[0], c2[1]).lineTo(c3[0], c3[1]).lineTo(c4[0], c4[1]).closePath()
-        }
-    })
-    const CubeTop = echarts.graphic.extendShape({
-        shape: {
-            x: 0,
-            y: 0
-        },
-        buildPath: function (ctx, shape) {
-            // 逆时针 角 y 负数向上  X 负数向左
-            const c1 = [shape.x, shape.y + 0]
-            const c2 = [shape.x + 10, shape.y - 4]
-            const c3 = [shape.x - 14, shape.y - 8]
-            const c4 = [shape.x - 25, shape.y - 4]
-            ctx.moveTo(c1[0], c1[1]).lineTo(c2[0], c2[1]).lineTo(c3[0], c3[1]).lineTo(c4[0], c4[1]).closePath()
-        }
-    })
-    echarts.graphic.registerShape('CubeLeft', CubeLeft)
-    echarts.graphic.registerShape('CubeRight', CubeRight)
-    echarts.graphic.registerShape('CubeTop', CubeTop)
-
     option = {
-        backgroundColor: '#031C5D',
-        tooltip: {
-
-            trigger: 'item',
-            textStyle: {
-                fontSize: 38
-            },
-            // formatter:'{b}'
-        },
+        // backgroundColor: 'rgba(0,0,0,.5)',
         legend: {
-            // show: true,
-            // itemWidth: 30,
-            // itemHeight: 20,
-            // textStyle: {
-            //     color: '#fff',
-            //     fontSize: 24
-            // }
-            data: [
-                {
-                    name:'党支部大会',
-                    itemStyle:{
-                        color:'#62caf9'
-                    }
-                },
-                {
-                    name:'支部委员会',
-                    itemStyle:{
-                        color:'#71e072'
-                    }
-                },
-                {
-                    name:'党小组会',
-                    itemStyle:{
-                        color:'#f6e46d'
-                    }
-                },
-                {
-                    name:'党课',
-                    itemStyle:{
-                        color:'#489fdc'
-                    }
-                },
+            top: '0%',
+            right: '2%',
+            orient: 'vertical',
+            textStyle: {  color: '#fff', fontSize: 22, },
+            data: ['人数'],
+            icon: 'roundRect',
+        },
+        radar: {
+            radius: '60%',
+            center: ['50%', '52%'],
+            startAngle: 0,
+            triggerEvent: true,
+            name: {  textStyle: { color: '#fff', fontSize: '20', borderRadius: 3, padding: [20, 5] } },
+            nameGap: '2',
+            indicator: [
+                { name: '无党派人士', max: 4000 },
+                { name: '群众', max: 4000 },
+                { name: '共青团员', max: 4000 },
+                { name: '共产党员', max: 4000 },
             ],
-            icon: 'circle',
-            itemWidth: 14,
-            itemHeight: 14,
-            right: 5,
-            selectedMode: false, //取消图例上的点击事件
-            textStyle: {
-                fontSize: 14,
-                color: '#FFFFFF'
-            }
-        },
-        grid: {
-            show: false,
-            left: '5%',
-            right: '5%',
-            bottom: '12%',
-            top: '20%',
-            containLabel: true
-        },
-        xAxis: {
-            type: 'category',
-            data: ['党委', '党总支', '党支部'],
-            axisLine: {
-                show: true,
-                lineStyle: {
-                    color: '#fff',
-                    width: 1
+            splitArea: {
+                areaStyle: {
+                    color: [ 'rgba(0,255,255, 0.1)', 'rgba(0,255,255, 0.2)', 'rgba(0,255,255, 0.3)', 'rgba(0,255,255, 0.4)', 'rgba(0,255,255, 0.5)', 'rgba(0,255,255, 0.6)', ].reverse(),
+                    shadowColor: 'rgba(0, 0, 0, 1)',
+                    shadowBlur: 30,
+                    shadowOffsetX: 10,
+                    shadowOffsetY: 10
                 }
             },
-            offset: 10,
-            axisTick: {
-                show: false
-            },
-            axisLabel: {
-                fontSize: 38,
-                color: '#fff'
-            }
-        },
-        yAxis: {
-            name: '个',
-            nameTextStyle: {
-                fontSize: 38,
-                color: '#fff'
-            },
-            nameGap: 30,
-            show: true,
-            type: 'value',
-            axisLine: {
-                show: false,
-                lineStyle: {
-                    color: 'white',
-                    width: 3
-                }
-            },
+            axisLine: {  lineStyle: { color: 'rgba(0,206,209, 0.3)' } },
             splitLine: {
-                show: true,
                 lineStyle: {
-                    color: 'rgba(255,255,255,0.3)',
-                    width: 1
+                    width: 1,
+                    color: [ 'rgba(0,206,209, 0.1)', 'rgba(0,206,209, 0.2)', 'rgba(0,206,209, 0.3)', 'rgba(0,206,209, 0.4)', 'rgba(0,206,209, 0.5)', 'rgba(0,206,209, 0.6)' ].reverse()
                 }
-            },
-            axisTick: {
-                show: false
-            },
-            axisLabel: {
-                fontSize: 38,
-                color: '#fff'
-            },
-            boundaryGap: ['5%', '5%']
+            }
         },
         series: [{
-            type: 'custom',
-            name: '党支部大会',
-            renderItem: (params, api) => {
-                const location = api.coord([api.value(0), api.value(1)])
-                return {
-                    type: 'group',
-                    children: [{
-                        type: 'CubeLeft',
-                        position: [-75, 0],
-                        shape: {
-                            api,
-                            xValue: api.value(0),
-                            yValue: api.value(1),
-                            x: location[0],
-                            y: location[1],
-                            xAxisPoint: api.coord([api.value(0), 0])
-                        },
-                        style: {
-                            fill: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
-                                offset: 0,
-                                color: '#4593ba'
-                            }, {
-                                offset: 1,
-                                color: '#6adcd9'
-                            }])
-                        }
-                    }, {
-                        type: 'CubeRight',
-                        position: [-75, 0],
-                        shape: {
-                            api,
-                            xValue: api.value(0),
-                            yValue: api.value(1),
-                            x: location[0],
-                            y: location[1],
-                            xAxisPoint: api.coord([api.value(0), 0])
-                        },
-                        style: {
-                            fill: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
-                                offset: 0,
-                                color: '#62caf9' // 顶部
-                            }, {
-                                offset: 1,
-                                color: '#76f3f0' // 底部
-                            }])
-                        }
-                    }, {
-                        type: 'CubeTop',
-                        position: [-75, 0],
-                        shape: {
-                            api,
-                            xValue: api.value(0),
-                            yValue: api.value(1),
-                            x: location[0],
-                            y: location[1],
-                            xAxisPoint: api.coord([api.value(0), 0])
-                        },
-                        style: {
-                            fill: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
-                                offset: 0,
-                                color: '#6fe5d5'
-                            }, {
-                                offset: 1,
-                                color: '#6adcd8'
-                            }])
-                        }
-                    }]
-                }
-            },
-            data: [6, 8, 8]
+            name: '人数',
+            type: 'radar',
+            areaStyle: { color: 'rgba(127,255,210, 0.5)' },
+            symbol: 'circle',
+            symbolSize: 12,
+            itemStyle: { color: 'rgba(127,255,210,0.8)', borderColor: 'rgba(127,255,210,0.2)', borderWidth: 10, },
+            lineStyle: { color: 'rgba(127,255,210, 0.6)', width: 2 },
+            label: { show: false, },
+            data: [ [855, 204, 983, 3601] ]
         },
-            {
-                type: 'custom',
-                name: '支部委员会',
-                renderItem: (params, api) => {
-                    // console.log(api)
-                    const location = api.coord([api.value(0), api.value(1)])
-                    console.log(location)
-                    return {
-                        type: 'group',
-                        children: [{
-                            type: 'CubeLeft',
-                            position: [-25, 0],
-                            shape: {
-                                api,
-                                xValue: api.value(0),
-                                yValue: api.value(1),
-                                x: location[0],
-                                y: location[1],
-                                xAxisPoint: api.coord([api.value(0), 0])
-                            },
-                            style: {
-                                fill: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
-                                    offset: 0,
-                                    color: '#5bb698'
-                                }, {
-                                    offset: 1,
-                                    color: '#6bd67a'
-                                }])
-                            }
-                        }, {
-                            type: 'CubeRight',
-                            position: [-25, 0],
-                            shape: {
-                                api,
-                                xValue: api.value(0),
-                                yValue: api.value(1),
-                                x: location[0],
-                                y: location[1],
-                                xAxisPoint: api.coord([api.value(0), 0])
-                            },
-                            style: {
-                                fill: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
-                                    offset: 0,
-                                    color: '#7bf3c5' // 顶部
-                                }, {
-                                    offset: 1,
-                                    color: '#79f18d' // 底部
-                                }])
-                            }
-                        }, {
-                            type: 'CubeTop',
-                            position: [-25, 0],
-                            shape: {
-                                api,
-                                xValue: api.value(0),
-                                yValue: api.value(1),
-                                x: location[0],
-                                y: location[1],
-                                xAxisPoint: api.coord([api.value(0), 0])
-                            },
-                            style: {
-                                fill: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
-                                    offset: 0,
-                                    color: '#71e072'
-                                }, {
-                                    offset: 1,
-                                    color: '#67ce79'
-                                }])
-                            }
-                        }]
-                    }
-                },
-                data: [30, 40, 20]
-            },
-            {
-                type: 'custom',
-                name: '党小组会',
-                renderItem: (params, api) => {
-                    const location = api.coord([api.value(0), api.value(1)])
-
-                    return {
-                        type: 'group',
-                        children: [{
-                            type: 'CubeLeft',
-                            position: [25, 0],
-                            shape: {
-                                api,
-                                xValue: api.value(0),
-                                yValue: api.value(1),
-                                x: location[0],
-                                y: location[1],
-                                xAxisPoint: api.coord([api.value(0), 0])
-                            },
-                            style: {
-                                fill: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
-                                    offset: 0,
-                                    color: '#d7a81b'
-                                }, {
-                                    offset: 1,
-                                    color: '#cbc61f'
-                                }])
-                            }
-                        }, {
-                            type: 'CubeRight',
-                            position: [25, 0],
-                            shape: {
-                                api,
-                                xValue: api.value(0),
-                                yValue: api.value(1),
-                                x: location[0],
-                                y: location[1],
-                                xAxisPoint: api.coord([api.value(0), 0])
-                            },
-                            style: {
-                                fill: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
-                                    offset: 0,
-                                    color: '#fef832' // 顶部
-                                }, {
-                                    offset: 1,
-                                    color: '#f5bf21' // 底部
-                                }])
-                            }
-                        }, {
-                            type: 'CubeTop',
-                            position: [25, 0],
-                            shape: {
-                                api,
-                                xValue: api.value(0),
-                                yValue: api.value(1),
-                                x: location[0],
-                                y: location[1],
-                                xAxisPoint: api.coord([api.value(0), 0])
-                            },
-                            style: {
-                                fill: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
-                                    offset: 0,
-                                    color: '#f6e46d'
-                                }, {
-                                    offset: 1,
-                                    color: '#d8b261'
-                                }])
-                            }
-                        }]
-                    }
-                },
-                data: [40, 50, 30]
-            },
-            {
-                type: 'custom',
-                name: '党课',
-                renderItem: (params, api) => {
-                    const location = api.coord([api.value(0), api.value(1)])
-
-                    return {
-                        type: 'group',
-                        children: [{
-                            type: 'CubeLeft',
-                            position: [75, 0],
-                            shape: {
-                                api,
-                                xValue: api.value(0),
-                                yValue: api.value(1),
-                                x: location[0],
-                                y: location[1],
-                                xAxisPoint: api.coord([api.value(0), 0])
-                            },
-                            style: {
-                                fill: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
-                                    offset: 0,
-                                    color: '#1477BD'
-                                }, {
-                                    offset: 1,
-                                    color: '#00FFFE'
-                                }])
-                            }
-                        }, {
-                            type: 'CubeRight',
-                            position: [75, 0],
-                            shape: {
-                                api,
-                                xValue: api.value(0),
-                                yValue: api.value(1),
-                                x: location[0],
-                                y: location[1],
-                                xAxisPoint: api.coord([api.value(0), 0])
-                            },
-                            style: {
-                                fill: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
-                                    offset: 0,
-                                    color: '#002E75' // 顶部
-                                }, {
-                                    offset: 1,
-                                    color: '#00B0D0' // 底部
-                                }])
-                            }
-                        }, {
-                            type: 'CubeTop',
-                            position: [75, 0],
-                            shape: {
-                                api,
-                                xValue: api.value(0),
-                                yValue: api.value(1),
-                                x: location[0],
-                                y: location[1],
-                                xAxisPoint: api.coord([api.value(0), 0])
-                            },
-                            style: {
-                                fill: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
-                                    offset: 0,
-                                    color: '#33F7FB'
-                                }, {
-                                    offset: 1,
-                                    color: '#00FFFE'
-                                }])
-                            }
-                        }]
-                    }
-                },
-                data: [35, 45, 20]
-            }]
-    }
+            // {
+            //     name: '2020评分',
+            //     type: 'radar',
+            //     areaStyle: { color: 'rgba(255,237,145, 0.5)' },
+            //     symbol: 'circle',
+            //     symbolSize: 12,
+            //     itemStyle: { color: 'rgba(255,237,145,0.8)', borderColor: 'rgba(255,237,145,0.2)', borderWidth: 10, },
+            //     lineStyle: { color: 'rgba(255,237,145, 0.6)', width: 2 },
+            //     data: [ [5300, 15000, 12800, 13500, 15000] ]
+            // }
+        ]
+    };
 
 
-    myChart.setOption(option)
+    // 设置配置项并渲染图表
+    myChart.setOption(option);
 
-
-    // window.onresize = _.throttle(myChart.resize,300);
-
+    // 窗口大小调整时重新渲染图表
+    window.onresize = _.throttle(myChart.resize, 300);
 </script>
+</body>
 </html>

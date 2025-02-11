@@ -1156,7 +1156,7 @@
                 // left: '3%',
                 // right: '3%',
                 // bottom: '5%',
-                baseTexture: '../images/map.png',
+                baseTexture: './images/1/map.png',
                 shading: 'color', // 地球中三维图形的着色效果
                 viewControl: {
                     alpha: "60deg",
